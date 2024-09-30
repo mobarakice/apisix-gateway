@@ -1,0 +1,61 @@
+services:
+  etcd:
+#    build:
+#      context: ./etcd                  # Path to the directory where your etcd Dockerfile is located
+#      dockerfile: Dockerfile            # Dockerfile for etcd
+    image: bitnami/etcd:latest      # The custom etcd image you built
+    container_name: etcd
+    networks:
+      - apisix_network
+    ports:
+      - "2379:2379"                    # Exposing etcd ports for client communication
+      - "2380:2380"                    # Exposing etcd ports for internal cluster communication
+    environment:
+      - ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379
+      - ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379
+#      - ETCD_ROOT_PASSWORD=rootpassword
+      - ALLOW_NONE_AUTHENTICATION=yes
+    volumes:
+      - etcd-data:/etcd-data            # Persistent volume for etcd data
+
+  apisix:
+    build:
+      context: ./apisix                 # Path to the directory where your APISIX Dockerfile is located
+      dockerfile: Dockerfile            # Dockerfile for APISIX
+    container_name: apisix
+    depends_on:
+      - etcd                            # Ensure APISIX waits for etcd to start
+    networks:
+      - apisix_network
+    ports:
+      - "9080:9080"                     # Exposing APISIX HTTP port
+      - "9180:9180"
+      - "9443:9443"                     # Exposing APISIX HTTPS port
+    environment:
+      - APISIX_ETCD_HOST=http://etcd:2379  # Set etcd connection for APISIX
+    volumes:
+      - ./apisix/conf/config.yaml:/usr/local/apisix/conf/config.yaml  # Bind custom APISIX config
+      - ./apisix/plugins/csrf.lua:/usr/local/apisix/apisix/plugins/csrf.lua  # Bind custom plugin
+
+  apisix-dashboard:
+    build:
+      context: ./apisix-dashboard
+      dockerfile: Dockerfile
+    container_name: apisix-dashboard
+    networks:
+      - apisix_network
+    ports:
+      - "9000:9000"   # APISIX Dashboard port
+    environment:
+      - APIX_ETCD_HOST=http://etcd:2379
+    depends_on:
+      - apisix
+      - etcd
+
+networks:
+  apisix_network:
+    driver: bridge
+
+volumes:
+  etcd-data:
+    driver: local
