@@ -1,4 +1,18 @@
 services:
+  redis:
+    image: redis:latest
+    container_name: redis
+    networks:
+      - apisix_network
+    ports:
+      - "6379:6379"
+    environment:
+#      - REDIS_PASSWORD=yourpassword
+      - ALLOW_EMPTY_PASSWORD=yes
+      - ALLOW_NO_PASSWORD=yes
+    volumes:
+      - redis-data:/data
+
   etcd:
 #    build:
 #      context: ./etcd                  # Path to the directory where your etcd Dockerfile is located
@@ -37,25 +51,27 @@ services:
       - ./apisix/conf/config.yaml:/usr/local/apisix/conf/config.yaml  # Bind custom APISIX config
       - ./apisix/plugins/csrf.lua:/usr/local/apisix/apisix/plugins/csrf.lua  # Bind custom plugin
 
-  apisix-dashboard:
-    build:
-      context: ./apisix-dashboard
-      dockerfile: Dockerfile
-    container_name: apisix-dashboard
-    networks:
-      - apisix_network
-    ports:
-      - "9000:9000"   # APISIX Dashboard port
-    environment:
-      - APIX_ETCD_HOST=http://etcd:2379
-    depends_on:
-      - apisix
-      - etcd
+#  apisix-dashboard:
+#    build:
+#      context: ./apisix-dashboard
+#      dockerfile: Dockerfile
+#    container_name: apisix-dashboard
+#    networks:
+#      - apisix_network
+#    ports:
+#      - "9000:9000"   # APISIX Dashboard port
+#    environment:
+#      - APIX_ETCD_HOST=http://etcd:2379
+#    depends_on:
+#      - apisix
+#      - etcd
 
 networks:
   apisix_network:
     driver: bridge
 
 volumes:
-  etcd-data:
+  redis-data:
     driver: local
+  etcd-data:
+      driver: local

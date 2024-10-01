@@ -44,6 +44,9 @@ deployment:
     prefix: "/apisix"               # apisix configurations prefix
     timeout: 30                     # 30 seconds
 
+  plugins:
+    - csrf  # Add this line to enable the CSRF plugin
+
 plugin_attr:
   prometheus:
     export_addr:
