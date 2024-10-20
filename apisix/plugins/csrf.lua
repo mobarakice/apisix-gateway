@@ -153,7 +153,7 @@ function _M.access(conf, ctx)
         local result = check_csrf_token(conf, ctx, header_token)
         local csrf_exist_token, get_err = get(red, "csrftoken")
         if not csrf_exist_token then
-            csrf_token_generate_and_store_ctx(conf,ctx, red)
+            csrf_token_generate_and_store_ctx(conf, ctx, red)
             return 401, { error_msg = "no csrf token in redis" }
         end
         if result and result ~= csrf_exist_token then
