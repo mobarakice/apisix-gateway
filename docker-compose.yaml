@@ -1,19 +1,19 @@
 services:
 
-  redis:
-    image: redis:latest
-    container_name: redis
-    networks:
-      - apisix_network
-    ports:
-      - "6379:6379"
-    environment:
-      - REDIS_PASSWORD="1234"
-    #      - ALLOW_EMPTY_PASSWORD=yes
-    #      - ALLOW_NO_PASSWORD=yes
-    command: [ "redis-server", "--requirepass", "1234" ]
-    volumes:
-      - redis-data:/data
+#  redis:
+#    image: redis:latest
+#    container_name: redis
+#    networks:
+#      - apisix_network
+#    ports:
+#      - "6379:6379"
+#    environment:
+#      - REDIS_PASSWORD="1234"
+#    #      - ALLOW_EMPTY_PASSWORD=yes
+#    #      - ALLOW_NO_PASSWORD=yes
+#    command: [ "redis-server", "--requirepass", "1234" ]
+#    volumes:
+#      - redis-data:/data
   
 
   etcd:
@@ -53,6 +53,7 @@ services:
     volumes:
       - ./apisix/conf/config.yaml:/usr/local/apisix/conf/config.yaml  # Bind custom APISIX config
       - ./apisix/plugins/csrf.lua:/usr/local/apisix/apisix/plugins/csrf.lua  # Bind custom plugin
+      - ./apisix/plugins/fxsrf.lua:/usr/local/apisix/apisix/plugins/fxsrf.lua  # Bind custom plugin
 
   apisix-dashboard:
     build:
@@ -81,5 +82,5 @@ networks:
 volumes:
   etcd-data:
     driver: local
-  redis-data:
-    driver: local
+#  redis-data:
+#    driver: local

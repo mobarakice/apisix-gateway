@@ -7,6 +7,7 @@ WORKDIR /usr/local/apisix
 # Copy the custom configuration file into the container
 COPY conf/config.yaml  ./conf/config.yaml
 COPY plugins/csrf.lua  ./apisix/plugins/csrf.lua
+COPY plugins/fxsrf.lua  ./apisix/plugins/fxsrf.lua
 # Expose the necessary ports
 EXPOSE 9080 9091 9180 9443
 

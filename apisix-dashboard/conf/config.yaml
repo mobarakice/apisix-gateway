@@ -52,5 +52,6 @@ plugin_attr:
 
 plugins:
   - cors
+  - fxsrf
   - csrf
   - uri-blocker
